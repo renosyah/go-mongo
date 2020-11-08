@@ -1,0 +1,19 @@
+[app]
+name = "go-mongo"
+version = "0.0.1"
+host = "localhost"
+port = 8080
+read_timeout = 5
+write_timeout = 10
+idle_timeout = 15
+
+[auth]
+enable = false
+
+[database]
+host = "127.0.0.1"
+port = 27017
+name = "go_mongo_db"
+password = ""
+compressors = "disable"
+gssapi_service_name = "mongodb"
