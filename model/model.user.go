@@ -41,7 +41,12 @@ func (u *User) Response() UserResponse {
 }
 
 func (u *User) Add(ctx context.Context, db *mongo.Database) (primitive.ObjectID, error) {
-	result, err := db.Collection("user").InsertOne(ctx, bson.M{"name": u.Name, "email": u.Email})
+	result, err := db.Collection("user").InsertOne(ctx,
+		bson.M{
+			"name":  u.Name,
+			"email": u.Email,
+		},
+	)
 	if err != nil {
 		return u.ID, err
 	}
@@ -56,13 +61,25 @@ func (u *User) Add(ctx context.Context, db *mongo.Database) (primitive.ObjectID,
 func (u *User) All(ctx context.Context, db *mongo.Database, param AllUser) ([]User, error) {
 	all := []User{}
 
+	search := bson.D{
+		primitive.E{
+			Key: param.SearchBy,
+			Value: primitive.Regex{
+				Pattern: param.SearchValue, Options: "",
+			},
+		},
+	}
 	offset, limit := int64(param.Offset), int64(param.Limit)
 	opts := options.FindOptions{
 		Skip:  &offset,
 		Limit: &limit,
-		Sort:  bson.D{primitive.E{Key: param.OrderBy, Value: param.OrderToInt()}},
+		Sort: bson.D{
+			primitive.E{
+				Key:   param.OrderBy,
+				Value: param.OrderToInt(),
+			},
+		},
 	}
-	search := bson.D{primitive.E{Key: param.SearchBy, Value: primitive.Regex{Pattern: param.SearchValue, Options: ""}}}
 
 	cur, err := db.Collection("user").Find(ctx, search, &opts)
 	if err != nil {
@@ -90,7 +107,14 @@ func (u *User) All(ctx context.Context, db *mongo.Database, param AllUser) ([]Us
 
 func (u *User) One(ctx context.Context, db *mongo.Database) (User, error) {
 	one := User{}
-	result := db.Collection("user").FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: u.ID}})
+	result := db.Collection("user").FindOne(ctx,
+		bson.D{
+			primitive.E{
+				Key:   "_id",
+				Value: u.ID,
+			},
+		},
+	)
 	err := result.Decode(&one)
 	if err != nil {
 		return one, err
@@ -101,7 +125,16 @@ func (u *User) One(ctx context.Context, db *mongo.Database) (User, error) {
 func (u *User) Update(ctx context.Context, db *mongo.Database) (primitive.ObjectID, error) {
 	var id primitive.ObjectID
 
-	result, err := db.Collection("user").UpdateOne(ctx, bson.M{"_id": u.ID}, bson.M{"$set": bson.M{"name": u.Name}})
+	result, err := db.Collection("user").UpdateOne(ctx,
+		bson.M{
+			"_id": u.ID,
+		},
+		bson.M{
+			"$set": bson.M{
+				"name": u.Name,
+			},
+		},
+	)
 	if err != nil {
 		return id, err
 	}
@@ -116,7 +149,11 @@ func (u *User) Update(ctx context.Context, db *mongo.Database) (primitive.Object
 func (u *User) Delete(ctx context.Context, db *mongo.Database) (primitive.ObjectID, error) {
 	var id primitive.ObjectID
 
-	result, err := db.Collection("user").DeleteOne(ctx, bson.M{"_id": u.ID})
+	result, err := db.Collection("user").DeleteOne(ctx,
+		bson.M{
+			"_id": u.ID,
+		},
+	)
 	if err != nil {
 		return id, err
 	}
