@@ -61,15 +61,16 @@ func (u *User) Add(ctx context.Context, db *mongo.Database) (primitive.ObjectID,
 func (u *User) All(ctx context.Context, db *mongo.Database, param AllUser) ([]User, error) {
 	all := []User{}
 
+	offset, limit := int64(param.Offset), int64(param.Limit)
 	search := bson.D{
 		primitive.E{
 			Key: param.SearchBy,
 			Value: primitive.Regex{
-				Pattern: param.SearchValue, Options: "",
+				Pattern: param.SearchValue,
+				Options: "",
 			},
 		},
 	}
-	offset, limit := int64(param.Offset), int64(param.Limit)
 	opts := options.FindOptions{
 		Skip:  &offset,
 		Limit: &limit,
