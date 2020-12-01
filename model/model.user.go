@@ -132,7 +132,8 @@ func (u *User) Update(ctx context.Context, db *mongo.Database) (primitive.Object
 		},
 		bson.M{
 			"$set": bson.M{
-				"name": u.Name,
+				"name":  u.Name,
+				"email": u.Email,
 			},
 		},
 	)
